@@ -15,7 +15,7 @@ namespace ByteZoo.Blog.Commands;
 /// Export heap command
 /// </summary>
 [Command(Name = "dumpheapexport", Aliases = ["DumpHeapExport", "dhe"], Help = "Export heap types & objects.")]
-public class DumpHeapExportCommand : ClrRuntimeCommandBase
+public class DumpHeapExportCommand : ExportCommandBase
 {
 
     #region Options
@@ -57,12 +57,6 @@ public class DumpHeapExportCommand : ClrRuntimeCommandBase
 
     [Option(Name = "-ignoreGCState", Help = "Ignore the GC's marker that the heap is not walkable (will generate lots of false positive errors).")]
     public bool IgnoreGCState { get; set; }
-
-    [Option(Name = "-outputType", Aliases = ["-outputtype", "-t"], Help = "Output type (CSV (Comma Delimited), Tab (Tab Delimited), JSON, default = JSON).")]
-    public string OutputType { get; set; } = "json";
-
-    [Option(Name = "-outputFile", Aliases = ["-outputfile", "-o"], Help = "Output file.")]
-    public string OutputFile { get; set; }
 
     [Argument(Help = "Filter by heap object memory range ([StartAddress [EndAddress]]).")]
     public string[] FilterMemoryRange { get; set; }
@@ -110,7 +104,7 @@ public class DumpHeapExportCommand : ClrRuntimeCommandBase
     /// </summary>
     /// <returns></returns>
     [HelpInvoke]
-    public static string GetCommandHelp() => """
+    public static string GetCommandHelp() => $"""
 
     DumpHeapExport [Options] [StartAddress [EndAddress]]
 
@@ -129,8 +123,7 @@ public class DumpHeapExportCommand : ClrRuntimeCommandBase
     -maxStringLength            Specify maximum string length (default = 1024).
     -minFragmentationBlockSize  Specify minimum fragmentation block size in bytes (default = 512 KB).
     -ignoreGCState              Ignore the GC's marker that the heap is not walkable (will generate lots of false positive errors).
-    -outputType, -t             Output type (CSV (Comma Delimited), Tab (Tab Delimited), JSON, default = JSON).
-    -outputFile, -o             Output file. If not specified, uses the console as output.
+    {GetExportOptions()}
     StartAddress                Filter by heap object memory start address.
     EndAddress                  Filter by heap object memory end address.
 
@@ -144,12 +137,6 @@ public class DumpHeapExportCommand : ClrRuntimeCommandBase
     /// </summary>
     /// <returns></returns>
     private DumpHeapExportService.DisplayType GetDisplayType() => Enum.TryParse(DisplayType, true, out DumpHeapExportService.DisplayType value) ? value : throw new ArgumentException($"Invalid display type '{DisplayType}' specified.");
-
-    /// <summary>
-    /// Return output type
-    /// </summary>
-    /// <returns></returns>
-    private DumpHeapExportService.OutputType GetOutputType() => Enum.TryParse(OutputType, true, out DumpHeapExportService.OutputType value) ? value : throw new ArgumentException($"Invalid output type '{OutputType}' specified.");
 
     /// <summary>
     /// Return MethodTable

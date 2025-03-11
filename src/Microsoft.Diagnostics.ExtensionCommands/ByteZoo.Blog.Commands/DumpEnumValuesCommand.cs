@@ -28,9 +28,6 @@ public class DumpEnumValuesCommand : ClrRuntimeCommandBase
     public string EnumModule { get; set; } = null!;
     #endregion
 
-    #region Services
-    #endregion
-
     #region Public Methods
     /// <summary>
     /// Execute the command

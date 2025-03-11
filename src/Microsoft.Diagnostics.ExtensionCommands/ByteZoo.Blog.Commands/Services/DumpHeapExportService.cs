@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ByteZoo.Blog.Commands.Enums;
 using ByteZoo.Blog.Commands.Interfaces;
 using ByteZoo.Blog.Commands.Output;
 using Microsoft.Diagnostics.DebugServices;
@@ -35,16 +36,6 @@ public class DumpHeapExportService
         ObjectSummary,
         ObjectFragmentationSummary
     }
-
-    /// <summary>
-    /// Output type
-    /// </summary>
-    public enum OutputType
-    {
-        CSV,
-        Tab,
-        Json
-    }
     #endregion
 
     #region Constants
@@ -74,7 +65,7 @@ public class DumpHeapExportService
     /// <param name="outputFile"></param>
     public void PrintHeap(IEnumerable<ClrObject> objects, DisplayType displayType, int maxStringLength, ulong minFragmentationBlockSize, OutputType outputType, string outputFile)
     {
-        TableExport details = IsDisplayTypeDetails(displayType) ? GetTableExport(GetDetailsColumns(displayType), outputType, outputFile) : null;
+        Table details = IsDisplayTypeDetails(displayType) ? TableExportFactory.GetTable(GetDetailsColumns(displayType), outputType, outputFile, ConsoleOrFileLogging) : null;
         Dictionary<(string String, ulong Size), uint> stringStatistics = [];
         Dictionary<ulong, (int Count, ulong Size, string TypeName)> objectStatistics = [];
         ClrObject lastFreeObject = default;
@@ -132,26 +123,6 @@ public class DumpHeapExportService
     #endregion
 
     #region Private Methods
-    /// <summary>
-    /// Return table export
-    /// </summary>
-    /// <param name="columns"></param>
-    /// <param name="outputType"></param>
-    /// <param name="outputFile"></param>
-    /// <returns></returns>
-    private TableExport GetTableExport(Column[] columns, OutputType outputType, string outputFile)
-    {
-        if (string.IsNullOrEmpty(outputFile))
-        {
-            return new TableExport(ConsoleOrFileLogging, outputType, columns);
-        }
-        else
-        {
-            ConsoleOrFileLogging.Enable(outputFile);
-            return new TableExport(ConsoleOrFileLogging, outputType, columns);
-        }
-    }
-
     /// <summary>
     /// Check if display type is details
     /// </summary>
@@ -301,7 +272,7 @@ public class DumpHeapExportService
     /// <param name="outputFile"></param>
     private void PrintStringStatistics(Dictionary<(string String, ulong Size), uint> statistics, OutputType outputType, string outputFile)
     {
-        TableExport table = GetTableExport([ColumnKind.IntegerWithoutCommas, ColumnKind.IntegerWithoutCommas, ColumnKind.Text], outputType, outputFile);
+        Table table = TableExportFactory.GetTable([ColumnKind.IntegerWithoutCommas, ColumnKind.IntegerWithoutCommas, ColumnKind.Text], outputType, outputFile, ConsoleOrFileLogging);
         table.WriteHeader("Count", "TotalSize", "Text");
         foreach (var item in statistics.Select(i => new { Count = i.Value, TotalSize = i.Value * i.Key.Size, String = SanitizeString(i.Key.String) }).OrderBy(i => i.TotalSize))
         {
@@ -319,7 +290,7 @@ public class DumpHeapExportService
     /// <param name="outputFile"></param>
     private void PrintObjectStatistics(Dictionary<ulong, (int Count, ulong Size, string TypeName)> statistics, OutputType outputType, string outputFile)
     {
-        TableExport table = GetTableExport([ColumnKind.DumpHeap, ColumnKind.IntegerWithoutCommas, ColumnKind.IntegerWithoutCommas, ColumnKind.TypeName], outputType, outputFile);
+        Table table = TableExportFactory.GetTable([ColumnKind.DumpHeap, ColumnKind.IntegerWithoutCommas, ColumnKind.IntegerWithoutCommas, ColumnKind.TypeName], outputType, outputFile, ConsoleOrFileLogging);
         table.WriteHeader("MT", "Count", "TotalSize", "ClassName");
         foreach (var item in statistics.Select(i => new { MethodTable = i.Key, i.Value.Count, i.Value.Size, i.Value.TypeName }).OrderBy(i => i.Size))
         {
@@ -337,7 +308,7 @@ public class DumpHeapExportService
     /// <param name="outputFile"></param>
     private void PrintFragmentationStatistics(List<(ClrObject Free, ClrObject Next)> statistics, OutputType outputType, string outputFile)
     {
-        TableExport table = GetTableExport([ColumnKind.ListNearObj, ColumnKind.IntegerWithoutCommas, ColumnKind.DumpObj, ColumnKind.TypeName], outputType, outputFile);
+        Table table = TableExportFactory.GetTable([ColumnKind.ListNearObj, ColumnKind.IntegerWithoutCommas, ColumnKind.DumpObj, ColumnKind.TypeName], outputType, outputFile, ConsoleOrFileLogging);
         table.WriteHeader("Address", "Size", "FollowedBy", "ClassName");
         foreach ((ClrObject free, ClrObject next) in statistics)
         {

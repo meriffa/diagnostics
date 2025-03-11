@@ -2,8 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Text;
+using ByteZoo.Blog.Commands.Enums;
 using ByteZoo.Blog.Commands.Interfaces;
-using ByteZoo.Blog.Commands.Services;
 using Microsoft.Diagnostics.DebugServices;
 using Microsoft.Diagnostics.ExtensionCommands.Output;
 
@@ -15,11 +15,11 @@ namespace ByteZoo.Blog.Commands.Output;
 /// <param name="console"></param>
 /// <param name="outputType"></param>
 /// <param name="columns"></param>
-internal sealed class TableExport(IConsoleOrFileLoggingService console, DumpHeapExportService.OutputType outputType, params Column[] columns) : Table(console, columns)
+internal sealed class TableExport(IConsoleOrFileLoggingService console, OutputType outputType, params Column[] columns) : Table(console, columns)
 {
 
     #region Private Members
-    private readonly char separator = outputType == DumpHeapExportService.OutputType.CSV ? ',' : '\t';
+    private readonly char separator = outputType == OutputType.CSV ? ',' : '\t';
     private string[] ColumnTitles = [];
     private bool rowWritten;
     #endregion
@@ -31,7 +31,7 @@ internal sealed class TableExport(IConsoleOrFileLoggingService console, DumpHeap
     /// <param name="values"></param>
     public override void WriteHeader(params string[] values)
     {
-        if (outputType == DumpHeapExportService.OutputType.Json)
+        if (outputType == OutputType.Json)
         {
             ColumnTitles = values;
             Console.Write("[");
@@ -49,7 +49,7 @@ internal sealed class TableExport(IConsoleOrFileLoggingService console, DumpHeap
     public override void WriteRow(params object[] values)
     {
         StringBuilder rowBuilder = _stringBuilderPool.Rent();
-        if (outputType == DumpHeapExportService.OutputType.Json)
+        if (outputType == OutputType.Json)
         {
             if (rowWritten)
             {
@@ -71,7 +71,7 @@ internal sealed class TableExport(IConsoleOrFileLoggingService console, DumpHeap
     /// <param name="values"></param>
     public override void WriteFooter(params object[] values)
     {
-        if (outputType == DumpHeapExportService.OutputType.Json)
+        if (outputType == OutputType.Json)
         {
             Console.WriteLine("]");
         }
