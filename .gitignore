@@ -22,7 +22,6 @@ x64/
 .dotnet-test/
 .packages/
 .tools/
-.vscode/
 build/
 
 # Per-user project properties
