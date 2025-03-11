@@ -4,12 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ByteZoo.Blog.Commands.Interfaces;
 using ByteZoo.Blog.Commands.Output;
 using Microsoft.Diagnostics.DebugServices;
 using Microsoft.Diagnostics.ExtensionCommands.Output;
 using Microsoft.Diagnostics.Runtime;
 
-namespace ByteZoo.Blog.Commands;
+namespace ByteZoo.Blog.Commands.Services;
 
 /// <summary>
 /// Export heap service
@@ -50,18 +51,15 @@ public class DumpHeapExportService
     private const char StringReplacementCharacter = '.';
     #endregion
 
-    #region Private Members
-    private IConsoleOrFileLoggingService consoleOrFileLogging;
-    #endregion
-
     #region Services
     [ServiceImport]
     public IConsoleService Console { get; set; }
 
-    public IConsoleOrFileLoggingService ConsoleOrFileLogging => consoleOrFileLogging ??= new ConsoleOrFileLoggingService(Console);
-
     [ServiceImport]
     public IMemoryService Memory { get; set; }
+
+    [ServiceImport]
+    public IConsoleOrFileLoggingService ConsoleOrFileLogging { get; set; }
     #endregion
 
     #region Public Methods

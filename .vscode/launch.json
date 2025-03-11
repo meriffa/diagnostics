@@ -2,18 +2,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (console)",
+            "name": "Launch (dotnet-dump)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "Build (Debug)",
             "program": "${workspaceFolder}/artifacts/bin/dotnet-dump/Debug/net8.0/dotnet-dump.dll",
-            "args": [],
+            "args": [
+                "analyze",
+                "/home/marian/Downloads/CoreDump_Full.<PID>"
+            ],
             "cwd": "${workspaceFolder}/src/Tools/dotnet-dump",
             "console": "integratedTerminal",
             "stopAtEntry": false
         },
         {
-            "name": ".NET Core Attach",
+            "name": "Attach (dotnet-dump)",
             "type": "coreclr",
             "request": "attach"
         }

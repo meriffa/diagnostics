@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build Solution (Debug)",
+            "label": "Build (Debug)",
             "command": "build.sh",
             "type": "process",
             "group": "build",
@@ -13,7 +13,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Build Solution (Release)",
+            "label": "Build (Release)",
             "command": "build.sh",
             "type": "process",
             "group": "build",

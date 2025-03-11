@@ -5,20 +5,26 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using ByteZoo.Blog.Commands.Interfaces;
 using Microsoft.Diagnostics.DebugServices;
 
-namespace ByteZoo.Blog.Commands;
+namespace ByteZoo.Blog.Commands.Services;
 
 /// <summary>
 /// Log to console or file service
 /// </summary>
-/// <param name="console"></param>
-public class ConsoleOrFileLoggingService(IConsoleService console) : IConsoleOrFileLoggingService
+[ServiceExport(Scope = ServiceScope.Runtime, Type = typeof(IConsoleOrFileLoggingService))]
+public class ConsoleOrFileLoggingService : IConsoleOrFileLoggingService
 {
 
     #region Private Members
     private readonly List<StreamWriter> writers = [];
     private FileStream consoleStream;
+    #endregion
+
+    #region Services
+    [ServiceImport]
+    public IConsoleService Console { get; set; }
     #endregion
 
     #region IConsoleService
@@ -30,7 +36,7 @@ public class ConsoleOrFileLoggingService(IConsoleService console) : IConsoleOrFi
     {
         if (writers.Count == 0)
         {
-            console.Write(value);
+            Console.Write(value);
         }
         else
         {
@@ -46,7 +52,7 @@ public class ConsoleOrFileLoggingService(IConsoleService console) : IConsoleOrFi
     {
         if (writers.Count == 0)
         {
-            console.WriteWarning(value);
+            Console.WriteWarning(value);
         }
         else
         {
@@ -62,7 +68,7 @@ public class ConsoleOrFileLoggingService(IConsoleService console) : IConsoleOrFi
     {
         if (writers.Count == 0)
         {
-            console.WriteError(value);
+            Console.WriteError(value);
         }
         else
         {
@@ -78,7 +84,7 @@ public class ConsoleOrFileLoggingService(IConsoleService console) : IConsoleOrFi
     {
         if (writers.Count == 0)
         {
-            console.WriteDml(text);
+            Console.WriteDml(text);
         }
         else
         {
@@ -95,7 +101,7 @@ public class ConsoleOrFileLoggingService(IConsoleService console) : IConsoleOrFi
     {
         if (writers.Count == 0)
         {
-            console.WriteDmlExec(text, action);
+            Console.WriteDmlExec(text, action);
         }
         else
         {
@@ -106,17 +112,17 @@ public class ConsoleOrFileLoggingService(IConsoleService console) : IConsoleOrFi
     /// <summary>
     /// Gets whether <see cref="WriteDml"/> is supported.
     /// </summary>
-    public bool SupportsDml => console.SupportsDml;
+    public bool SupportsDml => Console.SupportsDml;
 
     /// <summary>
     /// Cancellation token for current command
     /// </summary>
-    public CancellationToken CancellationToken { get => console.CancellationToken; set => console.CancellationToken = value; }
+    public CancellationToken CancellationToken { get => Console.CancellationToken; set => Console.CancellationToken = value; }
 
     /// <summary>
     /// Screen or window width or 0.
     /// </summary>
-    public int WindowWidth => console.WindowWidth;
+    public int WindowWidth => Console.WindowWidth;
     #endregion
 
     #region IConsoleFileLoggingService

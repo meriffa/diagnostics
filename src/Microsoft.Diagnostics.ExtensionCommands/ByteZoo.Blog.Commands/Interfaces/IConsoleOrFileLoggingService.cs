@@ -4,7 +4,7 @@
 using System;
 using Microsoft.Diagnostics.DebugServices;
 
-namespace ByteZoo.Blog.Commands;
+namespace ByteZoo.Blog.Commands.Interfaces;
 
 /// <summary>
 /// Log to console or file service interface
