@@ -20,7 +20,7 @@ namespace ByteZoo.Blog.Commands.Services;
 public class DumpHeapExportService
 {
 
-    #region Enums
+    #region Display Type
     /// <summary>
     /// Display type
     /// </summary>
